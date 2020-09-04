@@ -7,4 +7,4 @@ you should read https://github.com/ultralytics/yolov5/issues/891 first to conver
 ```bash
 pip install -qr requirements.txt
 ```
-This is project is a SDK to use transformed models(.xml and .bin).
+This is repository  is a SDK to use transformed models(.xml and .bin).
