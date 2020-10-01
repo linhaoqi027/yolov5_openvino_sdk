@@ -24,4 +24,4 @@ python3 /opt/intel/openvino_2020.4.287/deployment_tools/model_optimizer/mo.py \
  then you can get openvino model .bin and .xml.
 
 ## WARNING:NMS is not included in openvino model.
-AS for how to use openvino to inference ,please refer to 
+AS for how to use openvino to inference ,please refer to SDK
