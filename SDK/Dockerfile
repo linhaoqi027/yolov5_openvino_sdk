@@ -1,0 +1,65 @@
+FROM uhub.service.ucloud.cn/eagle_nest/cuda10.1-cudnn7.5.1-dev-ubuntu16.04-opencv4.1.1-torch1.4.0-openvino2020r1
+
+RUN pip install lxml
+RUN pip install Cython
+RUN pip install matplotlib>=3.2.2
+RUN pip install numpy>=1.18.5
+RUN pip install opencv-python
+RUN pip install pillow
+RUN pip install PyYAML==5.3.1
+RUN pip install scipy==1.5.2
+RUN pip install tensorboard>=2.2
+RUN pip install torch==1.5.1
+RUN pip install torchvision==0.6.1
+RUN pip install tqdm>=4.41.0
+RUN pip install coremltools==4.0b2
+RUN pip install onnx==1.6.0
+
+
+
+
+
+
+
+RUN rm -rf /usr/local/ev_sdk && mkdir -p /usr/local/ev_sdk
+COPY ./ /usr/local/ev_sdk
+
+RUN \
+    cd /usr/local/ev_sdk && mkdir -p build && rm -rf build/* \
+    && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j4 install && rm -rf ../build/*
+
+# 如果使用Python接口编写代码需要添加一个环境变量
+ENV AUTO_TEST_USE_JI_PYTHON_API=1
+
+
+
+
+# Remove old version
+RUN rm -rf /opt/intel/
+# Download and install 2020r4
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends cpio sudo lsb-release \
+    && cd /usr/local/src \
+    && wget http://10.9.0.146:8888/group1/M00/01/0B/CgkAkl8yRomEOlssAAAAAHMwDr4446.tgz -O l_openvino_toolkit_p_2020.4.287.tgz \
+    && tar xf l_openvino_toolkit_p_2020.4.287.tgz  \
+    && cd l_openvino_toolkit_p_2020.4.287 \
+    && sed -i 's/decline/accept/g' silent.cfg \
+    && ./install.sh -s silent.cfg \
+    && clean-layer.sh
+
+# Install prerequisite
+RUN bash -c "source /opt/intel/openvino/bin/setupvars.sh" && cd /opt/intel/openvino/install_dependencies/ && sed -i 's/sudo -E //' ./install_openvino_dependencies.sh && ./install_openvino_dependencies.sh \
+    && cd /opt/intel/openvino/deployment_tools/model_optimizer/install_prerequisites && sed -i 's/sudo -E //' ./install_prerequisites.sh && sed -i 's/python3-pip python3-venv//' ./install_prerequisites.sh && sed -i 's|pip install|pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/|' ./install_prerequisites.sh && ./install_prerequisites_onnx.sh \
+    && sed -i 's/source "$INSTALLDIR\/opencv\/setupvars.sh"/echo "$INSTALLDIR\/opencv\/setupvars.sh"/' /opt/intel/openvino/bin/setupvars.sh \
+    && echo "source /opt/intel/openvino/bin/setupvars.sh" >> /etc/profile.d/openvino.sh \
+    && clean-layer.sh
+
+# Setup env
+ENV HDDL_INSTALL_DIR=/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/external/hddl
+    ENV LD_LIBRARY_PATH=/opt/intel/openvino_2020.4.287/deployment_tools/ngraph/lib:/opt/intel/opencl:/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/external/hddl/lib:/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/external/gna/lib:/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/external/mkltiny_lnx/lib:/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/external/tbb/lib:/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/lib/intel64:${LD_LIBRARY_PATH}
+ENV PATH=/opt/intel/openvino_2020.4.287/deployment_tools/model_optimizer:${PATH}
+ENV InferenceEngine_DIR=/opt/intel/openvino_2020.4.287/deployment_tools/inference_engine/share
+    ENV PYTHONPATH=/opt/intel/openvino_2020.4.287/python/python3.6:/opt/intel/openvino_2020.4.287/python/python3:/opt/intel/openvino_2020.4.287/deployment_tools/open_model_zoo/tools/accuracy_checker:/opt/intel/openvino_2020.4.287/deployment_tools/model_optimizer:${PYTHONPATH}
+ENV INTEL_OPENVINO_DIR=/opt/intel/openvino_2020.4.287
+ENV INTEL_CVSDK_DIR=/opt/intel/openvino_2020.4.287
+ENV PYTHONPATH=/usr/local/lib/python3.6/dist-packages/:${PYTHONPATH}
