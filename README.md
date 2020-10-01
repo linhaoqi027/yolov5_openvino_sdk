@@ -17,7 +17,7 @@ you can install following https://bbs.cvmart.net/topics/3117
 
 ## Convert onnx to openvino
 AS for how to use openvino to inference ,please refer to [SDK](https://github.com/linhaoqi027/yolov5_openvino_sdk/tree/master/SDK)
-using (convert_openvino.sh)[https://github.com/linhaoqi027/yolov5_openvino_sdk/blob/master/SDK/convert_openvino.sh] to convert onnx to openvino.Then you can get openvino model .bin and .xml.
+using [convert_openvino.sh](https://github.com/linhaoqi027/yolov5_openvino_sdk/blob/master/SDK/convert_openvino.sh) to convert onnx to openvino.Then you can get openvino model .bin and .xml.
 
 ## use openvino model to inference picture.
 This profile provide an SDK.
