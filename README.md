@@ -21,5 +21,5 @@ using [convert_openvino.sh](https://github.com/linhaoqi027/yolov5_openvino_sdk/b
 
 ## use openvino model to inference picture.
 This profile provide an SDK.
-using (ji.py)[https://github.com/linhaoqi027/yolov5_openvino_sdk/blob/master/SDK/ji.py] to using transformed openvino model.
+using [ji.py](https://github.com/linhaoqi027/yolov5_openvino_sdk/blob/master/SDK/ji.py) to using transformed openvino model.
 (WARNING:NMS is not included in openvino model.)
